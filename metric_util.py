@@ -1,24 +1,13 @@
 import joblib
 import math
 import numpy as np
-import os
+
 from copy import deepcopy
 import argparse
 
 import torch
 from safebench.scenario.scenario_definition.atomic_criteria import Status
-import re
 
-def sanitize_filename(filename):
-    return re.sub(r'[^a-zA-Z0-9\-_\.]', '_', filename)
-    
-def save_evaluation_results(iou_mean, map_evaluate, model_name, scenario_num, texture_name):
-    filename = f"model{model_name}-scenario{scenario_num}-texture{texture_name}.txt"
-    filepath = os.path.join('/path/to/save', sanitize_filename(filename))  # Specify your save directory
-    with open(filepath, 'w') as f:
-        f.write(f"IoU Mean List: {iou_mean}\n")
-        f.write(f"mAP Evaluate List: {map_evaluate}\n")
-    print(f"Results saved to {filepath}")
 
 def cal_out_of_road_length(sequence):
     out_of_road_raw = [i['off_road'] for i in sequence]
