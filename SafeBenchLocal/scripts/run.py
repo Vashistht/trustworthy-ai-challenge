@@ -45,6 +45,7 @@ if __name__ == '__main__':
     parser.add_argument('--tm_port', type=int, default=8000, help='traffic manager port')
     parser.add_argument('--fixed_delta_seconds', type=float, default=0.1)
     args = parser.parse_args()
+    print(args)
     args_dict = vars(args)
 
     err_list = []

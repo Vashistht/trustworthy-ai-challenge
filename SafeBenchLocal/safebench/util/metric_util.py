@@ -118,7 +118,6 @@ def get_route_scores(record_dict, time_out=30):
     all_scores['final_score'] = final_score
 
     return all_scores
-
 def compute_ap(recall, precision, method='interp'):
     """ Compute the average precision, given the recall and precision curves
     # Arguments
@@ -159,6 +158,34 @@ def _get_pr_curve(conf_scores, logits, num_gt, data_id, iou_thres=0.5):
     ap, mpre_input, mpre, mrec = compute_ap(recall, precision, method='continuous')
     return ap
 
+# our function from challenge 1
+def _get_pr_ap(conf_scores, logits, num_gt, data_id, iou_thres=0.5):
+
+    idx = torch.argsort(conf_scores, descending=True)
+    sorted_logits = logits[idx]
+
+    # Determine True Positives (TP) and False Positives (FP)
+    tp = (sorted_logits >= iou_thres).cumsum(0).float()
+    total_predictions = torch.arange(1, tp.size(0) + 1).float()
+
+    # Calculate Precision and Recall
+    precision = tp / total_predictions
+    recall = tp / num_gt
+
+    # Append sentinel values at the start and end of precision and recall curves
+    precision = torch.cat((torch.tensor([1.]), precision, torch.tensor([0.])))
+    recall = torch.cat((torch.tensor([0.]), recall, torch.tensor([1.])))
+
+    # Compute the precision envelope
+    for i in range(precision.size(0) - 1, 0, -1):
+        precision[i - 1] = torch.max(precision[i - 1], precision[i])
+
+    # Integrate precision with respect to recall to get AP
+    indices = torch.where(recall[1:] != recall[:-1])[0] + 1
+    ap = torch.sum((recall[indices] - recall[indices - 1]) * precision[indices]).item()
+
+    return ap
+
 def get_perception_scores(record_dict): 
     
     mAP = []
@@ -175,7 +202,7 @@ def get_perception_scores(record_dict):
         
         map_iou = []
         for th in np.arange(0.5, 1.0, 0.05):
-            map_iou.append(_get_pr_curve(conf_scores, logits, num_gt, data_id, iou_thres=th))
+            map_iou.append(_get_pr_ap(conf_scores, logits, num_gt, data_id, iou_thres=th))
 
         mAP.append(np.mean(map_iou))
         pred.append([rec['pred'] for rec in record_dict[data_id]])
@@ -185,8 +212,9 @@ def get_perception_scores(record_dict):
 
     IoU_mean = [np.mean(iou) for iou in IoU_list]
     
-
-
+    print('mean of IoU_mean:', np.mean(mAP))
+    print('mean of mAP:', np.mean(mAP) )
+    
     return {
         # 'scores': scores,
         # 'pred': pred,

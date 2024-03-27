@@ -29,7 +29,7 @@ from safebench.scenario.scenario_data_loader import ScenarioDataLoader, ScenicDa
 from safebench.scenario.tools.scenario_utils import scenario_parse, scenic_parse
 
 from safebench.util.logger import Logger, setup_logger_kwargs
-from safebench.util.metric_util import get_route_scores, get_perception_scores
+from SafeBenchLocal.safebench.util.metric_util_original import get_route_scores, get_perception_scores
 from safebench.util.scenic_utils import ScenicSimulator
 
 class ScenicRunner:
