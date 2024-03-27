@@ -212,7 +212,9 @@ def get_perception_scores(record_dict):
     IoU_mean = [np.mean(iou) for iou in IoU_list]
     
 
-
+    print('mean of IoU_mean:', np.mean(mAP))
+    print('mean of mAP:', np.mean(mAP) )
+    
     return {
         # 'scores': scores,
         # 'pred': pred,
