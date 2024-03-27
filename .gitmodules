@@ -1,0 +1,3 @@
+[submodule "SafeBench"]
+	path = SafeBench
+	url = https://github.com/trust-ai/SafeBench.git
